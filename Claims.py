@@ -134,6 +134,28 @@ if employers:
 if providers:
     filtered_df = filtered_df[filtered_df['Provider Name'].isin(providers)]
     
+# Calculate average visits
+if not filtered_df.empty:
+    try:
+        visits_per_period = filtered_df.groupby(['Year', 'Month'])['Claim ID'].count()
+        average_claim_amount = visits_per_period.mean() if not visits_per_period.empty else 0
+    except Exception as e:
+        st.error(f"Error calculating average visits: {e}")
+        average_claim_amount = 0
+else:
+    average_claim_amount = 0
+
+# Determine the filter description
+filter_description = ""
+if year:
+    filter_description += f"{', '.join(map(str, year))} "
+
+if month:
+    filter_description += f"{', '.join(month)} "
+if status:
+    filter_description += f"{', '.join(status)} "
+if not filter_description:
+    filter_description = "All Data"
 
 # Calculate metrics
 total_claimed_amount = filtered_df['Claim Amount'].sum()
@@ -197,7 +219,8 @@ display_metric(col1,"Total Amount", f"RWF {scaled_total_claimed_amount:,.0f}M")
 display_metric(col5,"Total Claims", f"{total_claims:,}")
 display_metric(col2,"Approved Amount", f"RWF {scaled_approved_claim_amount:,.0f}M")
 display_metric(col4,"Approval Percentage", f"{approval_percentage:.2f}%")
-display_metric(col3,"Average Amount", f"RWF {scaled_average_amount:,.2f}K")
+display_metric(col3, f"Average Visits ({filter_description.strip()})", value=f"RWF{scaled_average_amount:.2f}K")
+
 # Function to create Seaborn plot
 def create_seaborn_plot(data, x, y, title, kind='bar', **kwargs):
     plt.figure(figsize=(10, 6))
