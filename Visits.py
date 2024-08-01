@@ -128,7 +128,7 @@ data['quarter'] = data['quarter'].astype(str)
 st.sidebar.header("Filters")
 year = st.sidebar.multiselect("Select Year", options=sorted(data['year'].unique()))
 month = st.sidebar.multiselect("Select Month", options=sorted(data['MonthName'].unique()))
-quarter = st.sidebar.multiselect("Select Month", options=sorted(data['quarter'].unique()))
+quarter = st.sidebar.multiselect("Select Quarter", options=sorted(data['quarter'].unique()))
 visit_type = st.sidebar.multiselect("Select visit type", options=data['visit_type'].unique())
 
 
