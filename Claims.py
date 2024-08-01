@@ -219,7 +219,7 @@ display_metric(col1,"Total Amount", f"RWF {scaled_total_claimed_amount:,.0f}M")
 display_metric(col5,"Total Claims", f"{total_claims:,}")
 display_metric(col2,"Approved Amount", f"RWF {scaled_approved_claim_amount:,.0f}M")
 display_metric(col4,"Approval Percentage", f"{approval_percentage:.2f}%")
-display_metric(col3, f"Average Claims ({filter_description.strip()})", value=f"RWF{scaled_average_amount:.2f}K")
+display_metric(col3, f"Average Amount ({filter_description.strip()})", value=f"RWF{scaled_average_amount:.2f}K")
 
 # Function to create Seaborn plot
 def create_seaborn_plot(data, x, y, title, kind='bar', **kwargs):
