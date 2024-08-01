@@ -334,218 +334,223 @@ elif Specialisation:
 else:
     df_filtered = df
 
+if not df_filtered.empty:
 
-# Calculate metrics
-total_preauth = float(df_filtered.shape[0])  # Convert to float
-total_preauth_amount = df_filtered["PreAuth Amount"].sum()
-total_approved_preauth = df_filtered[df_filtered["Status"] == "Approved"].shape[0]
-approved_preauth_amount = df_filtered[df_filtered["Status"] == "Approved"]["PreAuth Amount"].sum()
-percentage_approval = (total_approved_preauth / total_preauth) * 100
 
-# Create 4-column layout for metric cards
-col1, col2, col3, col4 = st.columns(4)
+    # Calculate metrics
+    total_preauth = float(df_filtered.shape[0])  # Convert to float
+    total_preauth_amount = df_filtered["PreAuth Amount"].sum()
+    total_approved_preauth = df_filtered[df_filtered["Status"] == "Approved"].shape[0]
+    approved_preauth_amount = df_filtered[df_filtered["Status"] == "Approved"]["PreAuth Amount"].sum()
+    percentage_approval = (total_approved_preauth / total_preauth) * 100
 
-# Define CSS for the styled boxes
-st.markdown("""
-    <style>
-    .custom-subheader {
-        color: #e66c37;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        padding: 10px;
-        border-radius: 5px;
-        display: inline-block;
-    }
-    .metric-box {
-        padding: 10px;
-        border-radius: 10px;
-        text-align: center;
-        margin: 10px;
-        font-size: 1.2em;
-        font-weight: bold;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        border: 1px solid #ddd;
-    }
-    .metric-title {
-        color: #e66c37; /* Change this color to your preferred title color */
-        font-size: 1.2em;
-        margin-bottom: 10px;
-    }
-    .metric-value {
-        color: #008040;
-        font-size: 2em;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    # Create 4-column layout for metric cards
+    col1, col2, col3, col4 = st.columns(4)
 
-# Function to display metrics in styled boxes
-def display_metric(col, title, value):
-    col.markdown(f"""
-        <div class="metric-box">
-            <div class="metric-title">{title}</div>
-            <div class="metric-value">{value}</div>
-        </div>
+    # Define CSS for the styled boxes
+    st.markdown("""
+        <style>
+        .custom-subheader {
+            color: #e66c37;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .metric-box {
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+        }
+        .metric-title {
+            color: #e66c37; /* Change this color to your preferred title color */
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .metric-value {
+            color: #008040;
+            font-size: 2em;
+        }
+        </style>
         """, unsafe_allow_html=True)
-# Display metrics
-scaling_factor = 1_000_000  # For millions
-scaled_total_preauth_amount = total_preauth_amount / scaling_factor
-scaled_approved_preauth_amount = approved_preauth_amount / scaling_factor
 
-# Display metrics
-display_metric(col1, "Total PreAuths", f"{total_preauth:.0f}")
-display_metric(col2, "Total PreAuth Amount", f"RWF {scaled_total_preauth_amount:.2f} M")
-display_metric(col3, "Approved PreAuth Amount", f"RWF {scaled_approved_preauth_amount:.2f} M")
-display_metric(col4, "Percentage of Approval", f"{percentage_approval:.2f}%")
+    # Function to display metrics in styled boxes
+    def display_metric(col, title, value):
+        col.markdown(f"""
+            <div class="metric-box">
+                <div class="metric-title">{title}</div>
+                <div class="metric-value">{value}</div>
+            </div>
+            """, unsafe_allow_html=True)
+    # Display metrics
+    scaling_factor = 1_000_000  # For millions
+    scaled_total_preauth_amount = total_preauth_amount / scaling_factor
+    scaled_approved_preauth_amount = approved_preauth_amount / scaling_factor
 
-Specialisation_count = df_filtered.groupby("Specialisation").size().reset_index(name='Number of PreAuth')
-Specialisation_count = Specialisation_count.sort_values(by='Number of PreAuth', ascending=False)
+    # Display metrics
+    display_metric(col1, "Total PreAuths", f"{total_preauth:.0f}")
+    display_metric(col2, "Total PreAuth Amount", f"RWF {scaled_total_preauth_amount:.2f} M")
+    display_metric(col3, "Approved PreAuth Amount", f"RWF {scaled_approved_preauth_amount:.2f} M")
+    display_metric(col4, "Percentage of Approval", f"{percentage_approval:.2f}%")
+
+    Specialisation_count = df_filtered.groupby("Specialisation").size().reset_index(name='Number of PreAuth')
+    Specialisation_count = Specialisation_count.sort_values(by='Number of PreAuth', ascending=False)
 
 
-cols1, cols2 = st.columns((2))
-# bar chart for PreAuth by Specialisation
+    cols1, cols2 = st.columns((2))
+    # bar chart for PreAuth by Specialisation
 
-with cols1:
-    st.markdown('<h2 class="custom-subheader">PreAuth By Specialisation</h2>', unsafe_allow_html=True)    
+    with cols1:
+        st.markdown('<h2 class="custom-subheader">PreAuth By Specialisation</h2>', unsafe_allow_html=True)    
+        # Define custom colors
+        custom_colors = ["#008040"] 
+        
+        # Create the bar chart with custom colors
+        fig = px.bar(Specialisation_count, x="Specialisation", y="Number of PreAuth", template="seaborn",
+                    color_discrete_sequence=custom_colors)
+        
+        fig.update_traces(textposition='outside')
+        fig.update_layout(height=400) 
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+
+    # Donut chart for PreAuth by Status
+    status_counts = df_filtered["Status"].value_counts().reset_index()
+    status_counts.columns = ["Status", "Count"]
+    with cols2:
+        st.markdown('<h2 class="custom-subheader">PreAuth By Status</h2>', unsafe_allow_html=True)    
     # Define custom colors
-    custom_colors = ["#008040"] 
+        custom_colors = ["#1d340d", "#e66c37", "#3b9442", "#f8a785", "#CC3636" ] 
+
+        fig = px.pie(status_counts, names="Status", values="Count", hole=0.5, template = "plotly_dark", color_discrete_sequence=custom_colors)
+        fig.update_traces(textposition='outside', textinfo='percent')
+        fig.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=80))
+        st.plotly_chart(fig, use_container_width=True, height = 200)
+
+
+    # view data in a table
+    cl1, cl2 = st.columns((2))
+    with cl1:
+        with st.expander("Specialisation ViewData"):
+            st.write(Specialisation_count.style.background_gradient(cmap = "YlOrBr"))
+
+    with cl2:
+        with st.expander("Status ViewData"):
+            status_counts = df_filtered["Status"].value_counts().reset_index()
+            status_counts.columns = ["Status", "Count"]    
+            st.write(status_counts.style.background_gradient(cmap="YlOrBr"))    
+
+    # preauths by channel
+    channel = df_filtered["Channel"].value_counts().reset_index()
+    channel.columns = ["Channel", "Count"]
+
+    # pie chart for preauth by channel
+    with cl1:
+        st.markdown('<h2 class="custom-subheader">PreAuth By Channel</h2>', unsafe_allow_html=True) 
+
+        custom_colors = ["#461b09", "#e66c37", "#bf7353", "#1d340d", "#f8a785" ] 
     
-    # Create the bar chart with custom colors
-    fig = px.bar(Specialisation_count, x="Specialisation", y="Number of PreAuth", template="seaborn",
-                 color_discrete_sequence=custom_colors)
+        fig = px.pie(channel, names="Channel", values="Count", template = "seaborn", color_discrete_sequence=custom_colors)
+        fig.update_traces(textposition='outside', textinfo='percent')
+        fig.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=80))
     
-    fig.update_traces(textposition='outside')
-    fig.update_layout(height=400) 
-    
-    st.plotly_chart(fig, use_container_width=True)
-    
+        st.plotly_chart(fig, use_container_width=True, height = 200)
 
-# Donut chart for PreAuth by Status
-status_counts = df_filtered["Status"].value_counts().reset_index()
-status_counts.columns = ["Status", "Count"]
-with cols2:
-    st.markdown('<h2 class="custom-subheader">PreAuth By Status</h2>', unsafe_allow_html=True)    
- # Define custom colors
-    custom_colors = ["#1d340d", "#e66c37", "#3b9442", "#f8a785", "#CC3636" ] 
+    # bar chart for preauth amount
 
-    fig = px.pie(status_counts, names="Status", values="Count", hole=0.5, template = "plotly_dark", color_discrete_sequence=custom_colors)
-    fig.update_traces(textposition='outside', textinfo='percent')
-    fig.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=80))
-    st.plotly_chart(fig, use_container_width=True, height = 200)
+    amount_df = df_filtered.groupby(by = ["Specialisation"], as_index = False)["PreAuth Amount"].sum()
+    amount_df = amount_df.sort_values(by='PreAuth Amount', ascending=False)
 
+    with cl2:
+        st.markdown('<h2 class="custom-subheader">PreAuth Amount By Specialisation</h2>', unsafe_allow_html=True)    
+        custom_colors = ["#008040"]  # Replace with your desired colors
 
-# view data in a table
-cl1, cl2 = st.columns((2))
-with cl1:
-    with st.expander("Specialisation ViewData"):
-        st.write(Specialisation_count.style.background_gradient(cmap = "YlOrBr"))
+        fig = px.histogram(amount_df, x="Specialisation", y="PreAuth Amount", template="seaborn", color_discrete_sequence=custom_colors)
+        fig.update_traces(textposition='outside')
+        fig.update_layout(height=400, xaxis_title="PreAuth Amount",yaxis_title="Doctor Specialisation"
+        )  # Adjust the height as needed
+        st.plotly_chart(fig, use_container_width=True)
 
-with cl2:
-    with st.expander("Status ViewData"):
-        status_counts = df_filtered["Status"].value_counts().reset_index()
-        status_counts.columns = ["Status", "Count"]    
-        st.write(status_counts.style.background_gradient(cmap="YlOrBr"))    
+    # view data for amount and channel
 
-# preauths by channel
-channel = df_filtered["Channel"].value_counts().reset_index()
-channel.columns = ["Channel", "Count"]
+    cls1, cls2 = st.columns((2))
+    with cls2:
+        with st.expander("PreAuth Amount ViewData"):
+            st.write(amount_df.style.format({'PreAuth Amount': '${:,.2f}'}).background_gradient(cmap="YlOrBr"))
 
-# pie chart for preauth by channel
-with cl1:
-    st.markdown('<h2 class="custom-subheader">PreAuth By Channel</h2>', unsafe_allow_html=True) 
+    with cls1:
+        with st.expander("Channel ViewData"):
+            channel = df_filtered["Channel"].value_counts().reset_index()
+            channel.columns = ["Channel", "Count"]    
+            st.write(channel.style.background_gradient(cmap="YlOrBr"))   
 
-    custom_colors = ["#461b09", "#e66c37", "#bf7353", "#1d340d", "#f8a785" ] 
-   
-    fig = px.pie(channel, names="Channel", values="Count", template = "seaborn", color_discrete_sequence=custom_colors)
-    fig.update_traces(textposition='outside', textinfo='percent')
-    fig.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=80))
-  
-    st.plotly_chart(fig, use_container_width=True, height = 200)
-
-# bar chart for preauth amount
-
-amount_df = df_filtered.groupby(by = ["Specialisation"], as_index = False)["PreAuth Amount"].sum()
-amount_df = amount_df.sort_values(by='PreAuth Amount', ascending=False)
-
-with cl2:
-    st.markdown('<h2 class="custom-subheader">PreAuth Amount By Specialisation</h2>', unsafe_allow_html=True)    
-    custom_colors = ["#008040"]  # Replace with your desired colors
-
-    fig = px.histogram(amount_df, x="Specialisation", y="PreAuth Amount", template="seaborn", color_discrete_sequence=custom_colors)
-    fig.update_traces(textposition='outside')
-    fig.update_layout(height=400, xaxis_title="PreAuth Amount",yaxis_title="Doctor Specialisation"
-    )  # Adjust the height as needed
-    st.plotly_chart(fig, use_container_width=True)
-
-# view data for amount and channel
-
-cls1, cls2 = st.columns((2))
-with cls2:
-    with st.expander("PreAuth Amount ViewData"):
-        st.write(amount_df.style.format({'PreAuth Amount': '${:,.2f}'}).background_gradient(cmap="YlOrBr"))
-
-with cls1:
-    with st.expander("Channel ViewData"):
-        channel = df_filtered["Channel"].value_counts().reset_index()
-        channel.columns = ["Channel", "Count"]    
-        st.write(channel.style.background_gradient(cmap="YlOrBr"))   
-
-# time series chart
+    # time series chart
 
 
-# Group by day and count the occurrences
-area_chart_count = df_filtered.groupby(df_filtered["Date"].dt.strftime("%Y-%m-%d")).size().reset_index(name='Count')
-area_chart_amount = df_filtered.groupby(df_filtered["Date"].dt.strftime("%Y-%m-%d"))['PreAuth Amount'].sum().reset_index(name='Total Amount')
+    # Group by day and count the occurrences
+    area_chart_count = df_filtered.groupby(df_filtered["Date"].dt.strftime("%Y-%m-%d")).size().reset_index(name='Count')
+    area_chart_amount = df_filtered.groupby(df_filtered["Date"].dt.strftime("%Y-%m-%d"))['PreAuth Amount'].sum().reset_index(name='Total Amount')
 
-# Merge the count and amount data
-area_chart = pd.merge(area_chart_count, area_chart_amount, on='Date')
+    # Merge the count and amount data
+    area_chart = pd.merge(area_chart_count, area_chart_amount, on='Date')
 
-# Sort by the PreAuth Created Date
-area_chart = area_chart.sort_values("Date")
+    # Sort by the PreAuth Created Date
+    area_chart = area_chart.sort_values("Date")
 
-# Create the dual-axis area chart
-fig2 = make_subplots(specs=[[{"secondary_y": True}]])
+    # Create the dual-axis area chart
+    fig2 = make_subplots(specs=[[{"secondary_y": True}]])
 
-# Add traces
-fig2.add_trace(
-    go.Scatter(x=area_chart['Date'], y=area_chart['Count'], name="Number of PreAuth", fill='tozeroy', line=dict(color='#e66c37')),
-    secondary_y=False,
-)
-
-fig2.add_trace(
-    go.Scatter(x=area_chart['Date'], y=area_chart['Total Amount'], name="Total PreAuth Amount", fill='tozeroy', line=dict(color='#008040')),
-    secondary_y=True,
-)
-
-
-
-# Set x-axis title
-fig2.update_xaxes(title_text="Day of the Month", tickangle=45)  # Rotate x-axis labels to 45 degrees for better readability
-
-# Set y-axes titles
-fig2.update_yaxes(title_text="<b>Number Of PreAuth</b>", secondary_y=False)
-fig2.update_yaxes(title_text="<b>Total PreAuth Amount</b>", secondary_y=True)
-
-st.plotly_chart(fig2, use_container_width=True)
-
-# Expander for Combined Data Table
-with st.expander("PreAuth Data Table", expanded=False):
-    st.dataframe(area_chart.style.background_gradient(cmap='YlOrBr'))
-
-
-
-
-st.markdown('<h2 class="custom-subheader">Month-Wise Preauthorization Summary</h2>', unsafe_allow_html=True)    
-
-with st.expander("Summary_Table"):
-
-    colors = ["#527853", "#F9E8D9", "#F7B787", "#EE7214", "#B99470"]
-    custom_cmap = mcolors.LinearSegmentedColormap.from_list("EarthyPalette", colors)
-    st.markdown("Month-Wise Preauthorization By Amount Table")
-    df_filtered["month"] = df_filtered["Date"].dt.month_name()
-    # Create the pivot table
-    sub_specialisation_Year = pd.pivot_table(
-        data=df_filtered,
-        values="PreAuth Amount",
-        index=["Specialisation"],
-        columns="month"
+    # Add traces
+    fig2.add_trace(
+        go.Scatter(x=area_chart['Date'], y=area_chart['Count'], name="Number of PreAuth", fill='tozeroy', line=dict(color='#e66c37')),
+        secondary_y=False,
     )
-    st.write(sub_specialisation_Year.style.background_gradient(cmap="YlOrBr"))
+
+    fig2.add_trace(
+        go.Scatter(x=area_chart['Date'], y=area_chart['Total Amount'], name="Total PreAuth Amount", fill='tozeroy', line=dict(color='#008040')),
+        secondary_y=True,
+    )
+
+
+
+    # Set x-axis title
+    fig2.update_xaxes(title_text="Day of the Month", tickangle=45)  # Rotate x-axis labels to 45 degrees for better readability
+
+    # Set y-axes titles
+    fig2.update_yaxes(title_text="<b>Number Of PreAuth</b>", secondary_y=False)
+    fig2.update_yaxes(title_text="<b>Total PreAuth Amount</b>", secondary_y=True)
+
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # Expander for Combined Data Table
+    with st.expander("PreAuth Data Table", expanded=False):
+        st.dataframe(area_chart.style.background_gradient(cmap='YlOrBr'))
+
+
+
+
+    st.markdown('<h2 class="custom-subheader">Month-Wise Preauthorization Summary</h2>', unsafe_allow_html=True)    
+
+    with st.expander("Summary_Table"):
+
+        colors = ["#527853", "#F9E8D9", "#F7B787", "#EE7214", "#B99470"]
+        custom_cmap = mcolors.LinearSegmentedColormap.from_list("EarthyPalette", colors)
+        st.markdown("Month-Wise Preauthorization By Amount Table")
+        df_filtered["month"] = df_filtered["Date"].dt.month_name()
+        # Create the pivot table
+        sub_specialisation_Year = pd.pivot_table(
+            data=df_filtered,
+            values="PreAuth Amount",
+            index=["Specialisation"],
+            columns="month"
+        )
+        st.write(sub_specialisation_Year.style.background_gradient(cmap="YlOrBr"))
+
+else:
+    st.error("No data available for this selection")
