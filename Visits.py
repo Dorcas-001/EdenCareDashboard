@@ -376,14 +376,15 @@ if not filtered_data.empty:
             orientation='h',
             marker=dict(color='#008040'),
             text=top_specializations.values,
-            textposition='none',  
+            textposition='outside', 
+            textfont=dict(color='black'),  
             hoverinfo='x+text'
         ))
 
     fig_specializations.update_layout(
             xaxis_title="Number of Visits",
             yaxis_title="Doctor Specialization",
-            font=dict(color='white'),
+            font=dict(color='Black'),
             xaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
             yaxis=dict(title_font=dict(size=14), tickfont=dict(size=12)),
             margin=dict(l=0, r=0, t=30, b=50)

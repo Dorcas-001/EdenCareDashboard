@@ -492,6 +492,7 @@ if not df_filtered.empty:
 
     # time series chart
 
+    st.markdown('<h2 class="custom-subheader">Number of PreAuths and PreAuth Amount Over Time (2023 & 2024)</h2>', unsafe_allow_html=True)
 
     # Group by day and count the occurrences
     area_chart_count = df_filtered.groupby(df_filtered["Date"].dt.strftime("%Y-%m-%d")).size().reset_index(name='Count')
