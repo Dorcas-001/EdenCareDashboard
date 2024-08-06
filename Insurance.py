@@ -84,6 +84,15 @@ if page == "Home":
     st.markdown('<div class="text">These dashboards are designed to provide insights into the three key processes of our insurance operations: Visits, Claims, and Preauthorization. Each section of the dashboard is dedicated to one of these processes, offering detailed visualizations and analyses to help improve operational efficiency and enhance the customer experience.</div>', unsafe_allow_html=True)
     st.markdown('<div class="separator"></div>', unsafe_allow_html=True)
 
+    # User Instructions
+    st.markdown('<h2 class="subheader">User Instructions</h2>', unsafe_allow_html=True)
+    st.markdown('<div class="text">1. <strong>Navigation:</strong> Use the menu on the left to navigate between visits, claims and Preauthorisation dashboards.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="text">2. <strong>Filters:</strong> Apply filters on the left side of each page to customize the data view.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="text">3. <strong>Manage visuals:</strong> Hover over the visuals and use the options on the top right corner of each visual to download zoom or view on fullscreen</div>', unsafe_allow_html=True)
+    st.markdown('<div class="text">3. <strong>Manage Table:</strong> click on the dropdown icon (<img src="https://img.icons8.com/ios-glyphs/30/000000/expand-arrow.png"/>) on table below each visual to get a full view of the table data and use the options on the top right corner of each table to download or search and view on fullscreen.</div>', unsafe_allow_html=True)    
+    st.markdown('<div class="text">4. <strong>Refresh Data:</strong> The data will be manually refreshed on the last week of every quarter. </div>', unsafe_allow_html=True)
+    st.markdown('<div class="separator"></div>', unsafe_allow_html=True)
+
     # Processes Overview
     col1, col2 = st.columns((2))
     with col1:
@@ -106,12 +115,7 @@ if page == "Home":
     with cl2:
         st.image("undraw_mobile_development_re_wwsn.svg", caption='Eden Care Medical', use_column_width=True)
 
-    # Navigation
-    st.markdown('<h2 class="subheader">Navigation</h2>', unsafe_allow_html=True)
-    st.markdown('<div class="text">Use the sidebar to navigate to the different sections of the dashboard:</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-item">- <strong>Visits</strong>: Analyze patient visit data.</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-item">- <strong>Claims</strong>: Explore claims processing metrics.</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-item">- <strong>Preauthorization</strong>: Review preauthorization request data.</div>', unsafe_allow_html=True)
+    
 
 elif page == "Visits":
     exec(open("Visits.py").read())
