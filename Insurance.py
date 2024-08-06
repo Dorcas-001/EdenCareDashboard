@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # SIDEBAR FILTER
-logo_url = 'EC_logo.png'  
+logo_url = 'EC_logo (2).png'  
 st.sidebar.image(logo_url, use_column_width=True)
 
 page = st.sidebar.selectbox("Choose a dashboard", ["Home", "Visits", "Claims", "Preauthorization"])
