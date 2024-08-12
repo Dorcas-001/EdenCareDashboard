@@ -309,54 +309,53 @@ if not filtered_df.empty:
         
     cols1, cols2 = st.columns((2))
     fig_claims_by_month_type = go.Figure()
-    
-    claims_by_month_type = filtered_df.groupby(['Month', 'Claim Type']).agg({
-        'Claim Amount': 'mean',
-        'Claim ID': 'count'
-    }).reset_index()
+    with cols1:
+        st.markdown('<h2 class="custom-subheader">Average Claim Amount by Month and Claim Type</h2>', unsafe_allow_html=True)
 
-    # Rename columns for clarity
-    claims_by_month_type.columns = ['Month', 'Claim Type', 'Average Claim Amount', 'Number of Claims']
+        claims_by_month_type = filtered_df.groupby(['Month', 'Claim Type']).agg({
+            'Claim Amount': 'mean',
+            'Claim ID': 'count'
+        }).reset_index()
 
-    # Sort the data by month to ensure the order is correct
-    months_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    claims_by_month_type['Month'] = pd.Categorical(claims_by_month_type['Month'], categories=months_order, ordered=True)
-    claims_by_month_type = claims_by_month_type.sort_values('Month')
+        # Rename columns for clarity
+        claims_by_month_type.columns = ['Month', 'Claim Type', 'Average Claim Amount', 'Number of Claims']
 
-    # Create the figure
-    fig_claims_by_month_type = go.Figure()
+        # Sort the data by month to ensure the order is correct
+        months_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        claims_by_month_type['Month'] = pd.Categorical(claims_by_month_type['Month'], categories=months_order, ordered=True)
+        claims_by_month_type = claims_by_month_type.sort_values('Month')
 
-    # Define colors for each claim type
-    colors = ['#1d340d', '#DEB887', '#FF4500', '#556B2F', '#32CD32', '#8B4513', '#FFA07A', '#006400']  # Replace these with your desired colors
-    claim_types = claims_by_month_type['Claim Type'].unique()
+        # Create the figure
+        fig_claims_by_month_type = go.Figure()
 
-    # Add bar traces for each claim type
-    for idx, claim_type in enumerate(claim_types):
-        subset = claims_by_month_type[claims_by_month_type['Claim Type'] == claim_type]
-        fig_claims_by_month_type.add_trace(go.Bar(
-            x=subset['Month'], 
-            y=subset['Average Claim Amount'], 
-            name=claim_type, 
-            marker_color=colors[idx % len(colors)]  # Cycle through colors
-        ))
+        # Define colors for each claim type
+        colors = ['#1d340d', '#DEB887', '#FF4500', '#556B2F', '#32CD32', '#8B4513', '#FFA07A', '#006400']  # Replace these with your desired colors
+        claim_types = claims_by_month_type['Claim Type'].unique()
 
-    # Update layout
-    fig_claims_by_month_type.update_layout(
-        yaxis=dict(title="Average Claim Amount", range=[0, 1000000]),  # Adjust the range as needed
-        xaxis=dict(title="Month"),
-        barmode='group',  # Group bars together by month
-        height=450, 
-        margin=dict(l=10, r=10, t=30, b=10),
-        title="Average Claim Amount by Month and Claim Type",
-        legend_title_text='Claim Type'
-    )
+        # Add bar traces for each claim type
+        for idx, claim_type in enumerate(claim_types):
+            subset = claims_by_month_type[claims_by_month_type['Claim Type'] == claim_type]
+            fig_claims_by_month_type.add_trace(go.Bar(
+                x=subset['Month'], 
+                y=subset['Average Claim Amount'], 
+                name=claim_type, 
+                marker_color=colors[idx % len(colors)]  # Cycle through colors
+            ))
 
-    # Display the chart in Streamlit
-    st.plotly_chart(fig_claims_by_month_type)
+        # Update layout
+        fig_claims_by_month_type.update_layout(
+            yaxis=dict(title="Average Claim Amount", range=[0, 1000000]),  # Adjust the range as needed
+            xaxis=dict(title="Month"),
+            barmode='group',  # Group bars together by month
+            height=450, 
+            margin=dict(l=10, r=10, t=30, b=10),
+            legend_title_text='Claim Type'
+        )
 
-    with st.expander("Average Claim Data Table"):
-        st.dataframe(claims_by_month_type.style.background_gradient(cmap='YlOrBr'))
+        # Display the chart in Streamlit
+        st.plotly_chart(fig_claims_by_month_type)
 
+        
     with cols2:
         # Number of Claims by Type (Pie chart)
         st.markdown('<h2 class="custom-subheader">Number of Claims by Type</h2>', unsafe_allow_html=True)
@@ -367,6 +366,11 @@ if not filtered_df.empty:
         fig_number_of_claims_type.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=80))
         st.plotly_chart(fig_number_of_claims_type, use_container_width=True)
 
+    clso1, clso2 = st.columns((2))
+    with clso1:
+        with st.expander("Average Claim Data Table"):
+            st.dataframe(claims_by_month_type.style.background_gradient(cmap='YlOrBr'))
+    with clso2:
         with st.expander("Number of Claims by Type Table", expanded=False):
             st.dataframe(number_of_claims_by_type.style.background_gradient(cmap='YlOrBr'))
 
@@ -457,6 +461,7 @@ if not filtered_df.empty:
         st.dataframe(combined_data.style.background_gradient(cmap='YlOrBr'))
 
 
+    st.markdown('<h2 class="custom-subheader">Month-Wise Claims Summary</h2>', unsafe_allow_html=True)    
 
     with st.expander("Summary Table"):
             
