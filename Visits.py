@@ -1,9 +1,10 @@
 import streamlit as st
 import matplotlib.colors as mcolors
+import plotly.express as px
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-
+from itertools import chain
 
 # Centered and styled main title using inline styles
 st.markdown('''
@@ -24,9 +25,13 @@ st.markdown('''
 
 st.markdown('<h1 class="main-title">SERVICE PROVIDER VISITS DASHBOARD</h1>', unsafe_allow_html=True)
 
-data = pd.read_csv('cleaned_data_visit.csv')
+data = pd.read_excel('cleaned_data_visit.xlsx')
 
 data["visit_date"] = pd.to_datetime(data["visit_created_on"])
+# Extract the year, month name, quarter, and hour from the 'visit_date' column
+
+
+st.dataframe(data)
 
 # Get minimum and maximum dates for the date input
 startDate = data["visit_date"].min()
@@ -151,9 +156,8 @@ if visit_type:
     filtered_data = filtered_data[filtered_data['visit_type'].isin(visit_type)]
 
 # Convert visit_created_on from string to datetime
-data['visit_created_on'] = pd.to_datetime(data['visit_created_on'])
+filtered_data['visit_created_on'] = pd.to_datetime(filtered_data['visit_created_on'])
 
-# Calculate average visits
 if not filtered_data.empty:
     try:
         visits_per_period = filtered_data.groupby(['year', 'quarter'])['visit_id'].count()
@@ -213,7 +217,7 @@ if not filtered_data.empty:
             margin-bottom: 10px;
         }
         .metric-value {
-            color: #008040;
+            color: #219C90;
             font-size: 2em;
         }
         </style>
@@ -235,13 +239,6 @@ if not filtered_data.empty:
     display_metric(col3, "Total Night Visits", f"{night_visits:.0f}")
     display_metric(col4, f"Average Visits ({filter_description.strip()})", value=f"{average_visits:.2f}")
 
-    fig_seasonal_visits = go.Figure(data=[go.Pie(
-            labels=["Day", "Night"],
-            values=[day_visits, night_visits],
-            textinfo='label+percent',  # Show labels, values, and percentages
-            hoverinfo='label+percent',  
-            marker=dict(colors=['#1d340d', '#FF4500']),
-    )])
     # Assuming filtered_data is your DataFrame
     filtered_data['visit_created_on'] = pd.to_datetime(filtered_data['visit_created_on'])
 
@@ -277,8 +274,7 @@ if not filtered_data.empty:
                 x=visits_by_month.index.astype(str),
                 y=visits_by_month.values,
                 name='Number of Visits',
-                marker_color='#008040',
-                opacity=0.7
+                marker_color='#219C90',
             )
 
             # Create the line chart for rate of change
@@ -302,8 +298,8 @@ if not filtered_data.empty:
                 xaxis=dict(title='Month'),
                 yaxis=dict(
                     title='Number of Visits',
-                    titlefont=dict(color='#008040'),
-                    tickfont=dict(color='#008040')
+                    titlefont=dict(color='#219C90'),
+                    tickfont=dict(color='#219C90')
                 ),
                 yaxis2=dict(
                     title='Rate of Change (%)',
@@ -326,8 +322,30 @@ if not filtered_data.empty:
             st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-            st.markdown('<h2 class="custom-subheader">Seasonal Visits</h2>', unsafe_allow_html=True)
-            st.plotly_chart(fig_seasonal_visits, use_container_width=True)
+        hourly_visits = filtered_data['hour'].value_counts().sort_index()
+
+                # Create the bar chart
+        fig = go.Figure()
+
+        # Add bar trace
+        fig.add_trace(go.Bar(
+            x=hourly_visits.index,
+            y=hourly_visits.values,
+            name='Number of Visits',
+            marker_color=['#219C90' if hour in range(6, 18) else '#e66c37' for hour in hourly_visits.index]
+        ))
+
+
+        # Update layout
+        fig.update_layout(
+            xaxis_title='Hour of the Day',
+            yaxis_title='Number of Visits',
+            legend_title='Legend'
+        ),
+        height=600,
+        margin=dict(l=0, r=0, t=30, b=0)
+        st.markdown('<h2 class="custom-subheader">Seasonal Visits</h2>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=True)
 
     cl1, cl2 = st.columns((2))
     with cl1:
@@ -374,7 +392,7 @@ if not filtered_data.empty:
             y=top_specializations.index,
             x=top_specializations.values,
             orientation='h',
-            marker=dict(color='#008040'),
+            marker=dict(color='#219C90'),
             text=top_specializations.values,
             textposition='outside', 
             textfont=dict(color='black'),  
@@ -421,7 +439,7 @@ if not filtered_data.empty:
     
     st.markdown('<h2 class="custom-subheader">Number of Visits By Day</h2>', unsafe_allow_html=True)
 
-    custom_colors = ["#008040"]  # Replace with your desired colors
+    custom_colors = ["#219C90"]  # Replace with your desired colors
 
     # Group data by day and count visits
     daily_visits = filtered_data.groupby(filtered_data['visit_created_on'].dt.to_period('D')).size()
@@ -439,8 +457,8 @@ if not filtered_data.empty:
         y=daily_visits_df['Number of Visits'],
         fill='tozeroy',
         mode='lines',
-        marker=dict(color='#008040'),
-        line=dict(color='#008040'),
+        marker=dict(color='#219C90'),
+        line=dict(color='#219C90'),
         name='Number of Visits'
     ))
 

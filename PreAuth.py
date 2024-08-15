@@ -373,7 +373,7 @@ if not df_filtered.empty:
             margin-bottom: 10px;
         }
         .metric-value {
-            color: #008040;
+            color: #219C90;
             font-size: 2em;
         }
         </style>
@@ -408,7 +408,7 @@ if not df_filtered.empty:
     with cols1:
         st.markdown('<h2 class="custom-subheader">PreAuth By Specialisation</h2>', unsafe_allow_html=True)    
         # Define custom colors
-        custom_colors = ["#008040"] 
+        custom_colors = ["#219C90"] 
         
         # Create the bar chart with custom colors
         fig = px.bar(Specialisation_count, x="Specialisation", y="Number of PreAuth", template="seaborn",
@@ -469,7 +469,7 @@ if not df_filtered.empty:
 
     with cl2:
         st.markdown('<h2 class="custom-subheader">PreAuth Amount By Specialisation</h2>', unsafe_allow_html=True)    
-        custom_colors = ["#008040"]  # Replace with your desired colors
+        custom_colors = ["#219C90"]  # Replace with your desired colors
 
         fig = px.histogram(amount_df, x="Specialisation", y="PreAuth Amount", template="seaborn", color_discrete_sequence=custom_colors)
         fig.update_traces(textposition='outside')
@@ -514,7 +514,7 @@ if not df_filtered.empty:
     )
 
     fig2.add_trace(
-        go.Scatter(x=area_chart['Date'], y=area_chart['Total Amount'], name="Total PreAuth Amount", fill='tozeroy', line=dict(color='#008040')),
+        go.Scatter(x=area_chart['Date'], y=area_chart['Total Amount'], name="Total PreAuth Amount", fill='tozeroy', line=dict(color='#219C90')),
         secondary_y=True,
     )
 
