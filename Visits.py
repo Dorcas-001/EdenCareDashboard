@@ -31,8 +31,6 @@ data["visit_date"] = pd.to_datetime(data["visit_created_on"])
 # Extract the year, month name, quarter, and hour from the 'visit_date' column
 
 
-st.dataframe(data)
-
 # Get minimum and maximum dates for the date input
 startDate = data["visit_date"].min()
 endDate = data["visit_date"].max()
@@ -217,7 +215,7 @@ if not filtered_data.empty:
             margin-bottom: 10px;
         }
         .metric-value {
-            color: #219C90;
+            color: #009DAE;
             font-size: 2em;
         }
         </style>
@@ -274,7 +272,7 @@ if not filtered_data.empty:
                 x=visits_by_month.index.astype(str),
                 y=visits_by_month.values,
                 name='Number of Visits',
-                marker_color='#219C90',
+                marker_color='#009DAE',
             )
 
             # Create the line chart for rate of change
@@ -298,8 +296,8 @@ if not filtered_data.empty:
                 xaxis=dict(title='Month'),
                 yaxis=dict(
                     title='Number of Visits',
-                    titlefont=dict(color='#219C90'),
-                    tickfont=dict(color='#219C90')
+                    titlefont=dict(color='#009DAE'),
+                    tickfont=dict(color='#009DAE')
                 ),
                 yaxis2=dict(
                     title='Rate of Change (%)',
@@ -332,7 +330,7 @@ if not filtered_data.empty:
             x=hourly_visits.index,
             y=hourly_visits.values,
             name='Number of Visits',
-            marker_color=['#219C90' if hour in range(6, 18) else '#e66c37' for hour in hourly_visits.index]
+            marker_color=['#009DAE' if hour in range(6, 18) else '#e66c37' for hour in hourly_visits.index]
         ))
 
 
@@ -340,10 +338,11 @@ if not filtered_data.empty:
         fig.update_layout(
             xaxis_title='Hour of the Day',
             yaxis_title='Number of Visits',
-            legend_title='Legend'
-        ),
-        height=600,
-        margin=dict(l=0, r=0, t=30, b=0)
+            legend_title='Legend',
+            height=600,
+            margin=dict(l=0, r=0, t=30, b=0)
+        )
+        
         st.markdown('<h2 class="custom-subheader">Seasonal Visits</h2>', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True)
 
@@ -367,7 +366,7 @@ if not filtered_data.empty:
     visits_by_type = filtered_data['visit_type'].value_counts()
     labels = visits_by_type.index.tolist()
     values = visits_by_type.values.tolist()
-    colors = ["#1d340d", "#e66c37", "#3b9442", "#f8a785", "#CC3636"]  # Example color palette
+    colors = ["#006E7F", "#e66c37", "#3b9442", "#f8a785", "#CC3636"]  # Example color palette
 
     fig = go.Figure(data=[go.Pie(
             labels=labels,
@@ -392,7 +391,7 @@ if not filtered_data.empty:
             y=top_specializations.index,
             x=top_specializations.values,
             orientation='h',
-            marker=dict(color='#219C90'),
+            marker=dict(color='#009DAE'),
             text=top_specializations.values,
             textposition='outside', 
             textfont=dict(color='black'),  
@@ -439,7 +438,7 @@ if not filtered_data.empty:
     
     st.markdown('<h2 class="custom-subheader">Number of Visits By Day</h2>', unsafe_allow_html=True)
 
-    custom_colors = ["#219C90"]  # Replace with your desired colors
+    custom_colors = ["#009DAE"]  # Replace with your desired colors
 
     # Group data by day and count visits
     daily_visits = filtered_data.groupby(filtered_data['visit_created_on'].dt.to_period('D')).size()
@@ -457,8 +456,8 @@ if not filtered_data.empty:
         y=daily_visits_df['Number of Visits'],
         fill='tozeroy',
         mode='lines',
-        marker=dict(color='#219C90'),
-        line=dict(color='#219C90'),
+        marker=dict(color='#009DAE'),
+        line=dict(color='#009DAE'),
         name='Number of Visits'
     ))
 

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
-teal_color = '#219C90'  # Teal green color code
+teal_color = '#009DAE'  # Teal green color code
 green_EC = '#138024'
 tangerine_color = '#E66C37'  # Tangerine orange color code
 st.markdown(
@@ -31,7 +31,7 @@ st.markdown(
         color: white;
     }
     .metric .metric-value {
-        color: #219C90;
+        color: #009DAE;
     }
     .metric .mertic-title {
         color: #FFA500;
@@ -60,7 +60,7 @@ st.markdown('<h1 class = "main-title">CLAIMS DASHBOARD</h1>', unsafe_allow_html=
 
 
 # Define colors to match the image
-color_palette = ['#1d340d', '#DEB887', '#FF4500', '#556B2F', '#32CD32', '#8B4513', '#FFA07A', '#006400']
+color_palette = ["#006E7F", "#e66c37","#461b09","#f8a785", "#CC3636",  '#FFC288', '#EFB08C', '#FAD3CF']
 # Loading the data
 @st.cache_data
 def load_data():
@@ -195,7 +195,7 @@ if not filtered_df.empty:
             margin-bottom: 10px;
         }
         .metric-value {
-            color: #219C90;
+            color: #009DAE;
             font-size: 2em;
         }
         </style>
@@ -262,7 +262,7 @@ if not filtered_df.empty:
             # Claim Amount by Year (Pie chart)
             st.markdown('<h2 class="custom-subheader"> Percentage Claimed Each Year</h2>', unsafe_allow_html=True)
             claim_by_year = filtered_df.groupby('Year')['Claim Amount'].sum().reset_index()
-            fig_claim_by_year = px.pie(claim_by_year, values='Claim Amount', names='Year', color_discrete_sequence=('#1d340d', '#e66c37'), height=400)
+            fig_claim_by_year = px.pie(claim_by_year, values='Claim Amount', names='Year', color_discrete_sequence=('#006E7F', '#e66c37'), height=400)
             fig_claim_by_year.update_traces(textposition='inside', textinfo='percent')
             fig_claim_by_year.update_layout(height=350, margin=dict(l=10, r=10, t=30, b=80))
             st.plotly_chart(fig_claim_by_year, use_container_width=True)
@@ -295,7 +295,7 @@ if not filtered_df.empty:
             fig_sources.update_layout(
                 xaxis_title="Number of Claims",
                 yaxis_title="Provider Type",
-                font=dict(color='white'),
+                font=dict(color='black'),
             )
         
             st.plotly_chart(fig_sources, use_container_width=True)
@@ -329,7 +329,7 @@ if not filtered_df.empty:
     fig_claims_by_month_type = go.Figure()
 
         # Define colors for each claim type
-    colors = ['#1d340d', '#DEB887', '#FF4500', '#556B2F', '#32CD32', '#8B4513', '#FFA07A', '#006400']  # Replace these with your desired colors
+    colors = ["#006E7F", "#461b09","#f8a785", "#CC3636",'#068DA9', "#e66c37", '#22A699', '#FFA07A', '#006400']  # Replace these with your desired colors
     claim_types = claims_by_month_type['Claim Type'].unique()
 
         # Add bar traces for each claim type
@@ -366,8 +366,21 @@ if not filtered_df.empty:
     with cls1:
     # Service Providers' Claim Amount (Scrollable bar chart)
         st.markdown('<h2 class="custom-subheader"> Service Providers Claim Amount</h2>', unsafe_allow_html=True)
-        provider_claims = filtered_df.groupby('Provider Name')['Claim Amount'].sum().sort_values(ascending=False).reset_index()
-        fig_providers = px.bar(provider_claims, x='Claim Amount', y='Provider Name', orientation='h', height=1000)
+        provider_claims = filtered_df.groupby('Provider Name').agg({
+            'Claim Amount': 'sum',
+            'Provider Name': 'count'
+        }).rename(columns={'Provider Name': 'Number of Claims'}).reset_index()
+        provider_claims = provider_claims.sort_values(by='Number of Claims', ascending=False)
+
+        # Create the bar chart
+        fig_providers = px.bar(
+            provider_claims,
+            x='Number of Claims',
+            y='Provider Name',
+            orientation='h',
+            height=1000,
+            hover_data={'Number of Claims': True}
+        )
         # fig_providers.update_traces(text=provider_claims['Claim Amount'].round(2), textposition='auto')
         fig_providers.update_traces(marker_color=teal_color)
         st.plotly_chart(fig_providers, use_container_width=True)
@@ -375,8 +388,24 @@ if not filtered_df.empty:
     with cls2:
     # Employers' Claim Amount (Scrollable bar chart)
         st.markdown('<h2 class="custom-subheader"> Employers Claim Amount</h2>', unsafe_allow_html=True)
-        employer_claims = filtered_df.groupby('Employer Name')['Claim Amount'].sum().sort_values(ascending=False).reset_index()
-        fig_employers = px.bar(employer_claims, x='Claim Amount', y='Employer Name', orientation='h', height=1000)
+        employer_claims = filtered_df.groupby('Employer Name').agg({
+            'Claim Amount': 'sum',
+            'Employer Name': 'count'
+        }).rename(columns={'Employer Name': 'Number of Claims'}).reset_index()
+
+        # Sort by 'Claim Amount' in descending order
+        employer_claims = employer_claims.sort_values(by='Claim Amount', ascending=False)
+
+        # Create the bar chart
+        fig_employers = px.bar(
+            employer_claims,
+            x='Claim Amount',
+            y='Employer Name',
+            orientation='h',
+            height=1000,
+            hover_data={'Number of Claims': True}
+        )
+
         fig_employers.update_traces(text=employer_claims['Claim Amount'].round(2), textposition='outside', marker_color=teal_color )
         st.plotly_chart(fig_employers, use_container_width=True)
 
@@ -385,17 +414,15 @@ if not filtered_df.empty:
 
 
     # Service Providers' Claim Amount
-    provider_claims = filtered_df.groupby('Provider Name')['Claim Amount'].sum().sort_values(ascending=False).reset_index()
 
     with cl1:
-        with st.expander("Top 10 Service Providers' Claim Amount"):   
+        with st.expander("Service Providers Claim Data"):   
             st.write(provider_claims.style.background_gradient(cmap="YlOrBr"))
 
 
     # Employer Names and Claim Amount
     with cl2:
-        with st.expander("Top 10 Employer Names and Claim Amount"):
-            employer_claims = filtered_df.groupby('Employer Name')['Claim Amount'].sum().sort_values(ascending=False).reset_index()
+        with st.expander("Employer Groups Claim Data"):
             st.write(employer_claims.style.background_gradient(cmap="YlOrBr"))
 
 
@@ -430,7 +457,7 @@ if not filtered_df.empty:
     )
 
     fig.add_trace(
-        go.Scatter(x=combined_data['Claim Created Date'], y=combined_data['Claim Amount'], name="Claim Amount", fill='tozeroy', line=dict(color='#219C90')),
+        go.Scatter(x=combined_data['Claim Created Date'], y=combined_data['Claim Amount'], name="Claim Amount", fill='tozeroy', line=dict(color='#009DAE')),
         secondary_y=True,
     )
 

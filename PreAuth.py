@@ -373,7 +373,7 @@ if not df_filtered.empty:
             margin-bottom: 10px;
         }
         .metric-value {
-            color: #219C90;
+            color: #009DAE;
             font-size: 2em;
         }
         </style>
@@ -408,7 +408,7 @@ if not df_filtered.empty:
     with cols1:
         st.markdown('<h2 class="custom-subheader">PreAuth By Specialisation</h2>', unsafe_allow_html=True)    
         # Define custom colors
-        custom_colors = ["#219C90"] 
+        custom_colors = ["#009DAE"] 
         
         # Create the bar chart with custom colors
         fig = px.bar(Specialisation_count, x="Specialisation", y="Number of PreAuth", template="seaborn",
@@ -426,7 +426,7 @@ if not df_filtered.empty:
     with cols2:
         st.markdown('<h2 class="custom-subheader">PreAuth By Status</h2>', unsafe_allow_html=True)    
     # Define custom colors
-        custom_colors = ["#1d340d", "#e66c37", "#3b9442", "#f8a785", "#CC3636" ] 
+        custom_colors = ["#006E7F", "#e66c37","#461b09","#f8a785", "#CC3636" ] 
 
         fig = px.pie(status_counts, names="Status", values="Count", hole=0.5, template = "plotly_dark", color_discrete_sequence=custom_colors)
         fig.update_traces(textposition='outside', textinfo='percent')
@@ -454,7 +454,7 @@ if not df_filtered.empty:
     with cl1:
         st.markdown('<h2 class="custom-subheader">PreAuth By Channel</h2>', unsafe_allow_html=True) 
 
-        custom_colors = ["#461b09", "#e66c37", "#bf7353", "#1d340d", "#f8a785" ] 
+        custom_colors = ["#006E7F", "#e66c37","#461b09","#f8a785"] 
     
         fig = px.pie(channel, names="Channel", values="Count", template = "seaborn", color_discrete_sequence=custom_colors)
         fig.update_traces(textposition='outside', textinfo='percent')
@@ -469,7 +469,7 @@ if not df_filtered.empty:
 
     with cl2:
         st.markdown('<h2 class="custom-subheader">PreAuth Amount By Specialisation</h2>', unsafe_allow_html=True)    
-        custom_colors = ["#219C90"]  # Replace with your desired colors
+        custom_colors = ["#009DAE"]  # Replace with your desired colors
 
         fig = px.histogram(amount_df, x="Specialisation", y="PreAuth Amount", template="seaborn", color_discrete_sequence=custom_colors)
         fig.update_traces(textposition='outside')
@@ -514,7 +514,7 @@ if not df_filtered.empty:
     )
 
     fig2.add_trace(
-        go.Scatter(x=area_chart['Date'], y=area_chart['Total Amount'], name="Total PreAuth Amount", fill='tozeroy', line=dict(color='#219C90')),
+        go.Scatter(x=area_chart['Date'], y=area_chart['Total Amount'], name="Total PreAuth Amount", fill='tozeroy', line=dict(color='#009DAE')),
         secondary_y=True,
     )
 
