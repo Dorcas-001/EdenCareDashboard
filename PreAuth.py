@@ -490,7 +490,56 @@ if not df_filtered.empty:
             channel.columns = ["Channel", "Count"]    
             st.write(channel.style.background_gradient(cmap="YlOrBr"))   
 
-    # time series chart
+
+
+# Daily hourly preauths
+ 
+    
+    portal_data = df_filtered[df_filtered['Channel'] == 'Portal']
+
+    if portal_data.empty:
+        st.error("No data found for the 'Portal' channel.")
+    else:
+        # Print unique specializations for debugging
+        unique_specializations = portal_data['Specialisation'].unique()
+        colors = ["#006E7F", "#461b09","#f8a785", "#CC3636",'#068DA9', "#e66c37", '#22A699', '#FFA07A', '#006400']  # Replace these with your desired colors
+
+        # Calculate the top 5 specializations
+        top_specializations = portal_data['Specialisation'].value_counts().nlargest(5).index
+
+        # Filter the DataFrame to only include the top 5 specializations
+        top_specializations_data = portal_data[portal_data['Specialisation'].isin(top_specializations)]
+
+        # Group by 'Hour' and 'specialization' and count the number of preauth requests
+        grouped_data = top_specializations_data.groupby(['Hour', 'Specialisation']).size().unstack(fill_value=0)
+
+        # Create the grouped bar chart
+        fig = go.Figure()
+
+        for idx, specialization in enumerate(top_specializations):
+            fig.add_trace(go.Bar(
+                x=grouped_data.index,
+                y=grouped_data[specialization],
+                name=specialization,
+                marker_color=colors[idx % len(colors)]  # Cycle through colors
+
+            ))
+
+        # Update layout
+        fig.update_layout(
+            barmode='group',
+            xaxis_title='Hour of the Day',
+            yaxis_title='Number of Preauth Requests',
+        )
+
+        # Display the chart
+        st.markdown('<h2 class="custom-subheader">Number of Preauth Requests by Hour and Specialization (Portal)</h2>', unsafe_allow_html=True)
+
+        st.plotly_chart(fig)
+
+
+    #  time series data
+
 
     st.markdown('<h2 class="custom-subheader">Number of PreAuths and PreAuth Amount Over Time (2023 & 2024)</h2>', unsafe_allow_html=True)
 
