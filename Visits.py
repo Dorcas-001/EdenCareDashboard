@@ -158,8 +158,20 @@ filtered_data['visit_created_on'] = pd.to_datetime(filtered_data['visit_created_
 
 if not filtered_data.empty:
     try:
+        # Calculate total days for the filtered data range
+        filtered_data['visit_created_on'] = pd.to_datetime(filtered_data['visit_created_on'])
+        start_date = filtered_data['visit_created_on'].min()
+        end_date = filtered_data['visit_created_on'].max()
+
+        # Calculate the total number of days between the start and end dates
+        total_days = (end_date - start_date).days + 1  # Including the start and end day
+
+        # Group visits by year, quarter, and day to calculate the average visits per day
         visits_per_period = filtered_data.groupby(['year', 'quarter'])['visit_id'].count()
-        average_visits = visits_per_period.mean() if not visits_per_period.empty else 0
+
+        # Calculate the average visits per day by dividing total visits by total number of days
+        average_visits = visits_per_period.sum() / total_days if not visits_per_period.empty else 0
+
     except Exception as e:
         st.error(f"Error calculating average visits: {e}")
         average_visits = 0
@@ -235,89 +247,80 @@ if not filtered_data.empty:
     display_metric(col1, "Total Visits", f"{total_visits:.0f}")
     display_metric(col2, "Total Day Visits", f"{day_visits:.0f} ")
     display_metric(col3, "Total Night Visits", f"{night_visits:.0f}")
-    display_metric(col4, f"Average Visits ({filter_description.strip()})", value=f"{average_visits:.2f}")
-
-    # Assuming filtered_data is your DataFrame
-    filtered_data['visit_created_on'] = pd.to_datetime(filtered_data['visit_created_on'])
-
-    # Extract the month and year from the 'visit_created_on' column
-    filtered_data['visit_month'] = filtered_data['visit_created_on'].dt.to_period('M')
-
-    # Get the month name for each visit
-    filtered_data['MonthName'] = filtered_data['visit_created_on'].dt.strftime('%b %Y')
+    display_metric(col4, f"Average Visits Per Day ({filter_description.strip()})", value=f"{average_visits:.2f}")
 
     # Count the number of visits per month
+    filtered_data['visit_month'] = filtered_data['visit_created_on'].dt.to_period('M')
+    filtered_data['MonthName'] = filtered_data['visit_created_on'].dt.strftime('%b %Y')
     visits_by_month = filtered_data['MonthName'].value_counts().sort_index()
 
     # Get the month with the maximum visits
     max_month = visits_by_month.idxmax()
-
-    # Convert the max_month string to a datetime object
     max_month_datetime = pd.to_datetime(max_month)
-
-    # Format the datetime object to the desired string format
     max_month_str = max_month_datetime.strftime('%b %Y')
-
-
     col1, col2 = st.columns(2)
 
     with col1:
-            st.markdown('<h2 class="custom-subheader">Monthly Visits and Rate of Change</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 class="custom-subheader">Monthly Visits and Rate of Change</h2>', unsafe_allow_html=True)
 
-            # Calculate the rate of change
-            monthly_change = visits_by_month.pct_change() * 100  
+        # Convert index to Period format for correct sorting (assuming visits_by_month has a PeriodIndex)
+        visits_by_month.index = pd.to_datetime(visits_by_month.index, format='%b %Y')
+        visits_by_month = visits_by_month.sort_index()  # Ensure it's sorted chronologically
 
-            # Create the bar chart for visits
-            bar_trace = go.Bar(
-                x=visits_by_month.index.astype(str),
-                y=visits_by_month.values,
-                name='Number of Visits',
-                marker_color='#009DAE',
-            )
+        # Calculate the rate of change
+        monthly_change = visits_by_month.pct_change() * 100  
 
-            # Create the line chart for rate of change
-            line_trace = go.Scatter(
-                x=visits_by_month.index.astype(str),
-                y=monthly_change,
-                name='Rate of Change (%)',
-                mode='lines+markers',
-                marker=dict(color='#FF4500'),
-                line=dict(color='#FF4500', width=2),
-                yaxis='y2'  # Link the line trace to the secondary y-axis
-            )
+        # Create the bar chart for visits
+        bar_trace = go.Bar(
+            x=visits_by_month.index.strftime('%b %Y'),  # Convert back to string for the x-axis
+            y=visits_by_month.values,
+            name='Number of Visits',
+            marker_color='#009DAE',
+        )
 
-            # Create the figure and add both traces
-            fig = go.Figure()
-            fig.add_trace(bar_trace)
-            fig.add_trace(line_trace)
+        # Create the line chart for rate of change
+        line_trace = go.Scatter(
+            x=visits_by_month.index.strftime('%b %Y'),
+            y=monthly_change,
+            name='Rate of Change (%)',
+            mode='lines+markers',
+            marker=dict(color='#FF4500'),
+            line=dict(color='#FF4500', width=2),
+            yaxis='y2'  # Link the line trace to the secondary y-axis
+        )
 
-            # Update layout
-            fig.update_layout(
-                xaxis=dict(title='Month'),
-                yaxis=dict(
-                    title='Number of Visits',
-                    titlefont=dict(color='#009DAE'),
-                    tickfont=dict(color='#009DAE')
-                ),
-                yaxis2=dict(
-                    title='Rate of Change (%)',
-                    titlefont=dict(color='#FF4500'),
-                    tickfont=dict(color='#FF4500'),
-                    overlaying='y',
-                    side='right'
-                ),
-                legend=dict(
-                    x=0.01,  # Position the legend inside the chart, close to the left
-                    y=0.99,  # Position the legend at the top
-                    xanchor='left',
-                    yanchor='top',
-                ),
-                height=600,
-                margin=dict(l=0, r=0, t=30, b=0)
-            )
+        # Create the figure and add both traces
+        fig = go.Figure()
+        fig.add_trace(bar_trace)
+        fig.add_trace(line_trace)
 
-            # Display the plot
-            st.plotly_chart(fig, use_container_width=True)
+        # Update layout
+        fig.update_layout(
+            xaxis=dict(title='Month'),
+            yaxis=dict(
+                title='Number of Visits',
+                titlefont=dict(color='#009DAE'),
+                tickfont=dict(color='#009DAE')
+            ),
+            yaxis2=dict(
+                title='Rate of Change (%)',
+                titlefont=dict(color='#FF4500'),
+                tickfont=dict(color='#FF4500'),
+                overlaying='y',
+                side='right'
+            ),
+            legend=dict(
+                x=0.01,  # Position the legend inside the chart, close to the left
+                y=0.99,  # Position the legend at the top
+                xanchor='left',
+                yanchor='top',
+            ),
+            height=600,
+            margin=dict(l=0, r=0, t=30, b=0)
+        )
+
+        # Display the plot
+        st.plotly_chart(fig, use_container_width=True)
 
     with col2:
         hourly_visits = filtered_data['hour'].value_counts().sort_index()
