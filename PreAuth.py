@@ -405,24 +405,31 @@ if not df_filtered.empty:
     cols1, cols2 = st.columns((2))
     # bar chart for PreAuth by Specialisation
 
+ 
+        
+        # Sort by 'Number of PreAuth' in descending order and select top 10
+    top_10_specialisations = Specialisation_count.sort_values(by='Number of PreAuth', ascending=False).head(15)
+
+
     with cols1:
         st.markdown('<h2 class="custom-subheader">PreAuth By Specialisation</h2>', unsafe_allow_html=True)    
         # Define custom colors
         custom_colors = ["#009DAE"] 
         
         # Create the bar chart with custom colors
-        fig = px.bar(Specialisation_count, x="Specialisation", y="Number of PreAuth", template="seaborn",
+        fig = px.bar(top_10_specialisations, x="Specialisation", y="Number of PreAuth", template="seaborn",
                     color_discrete_sequence=custom_colors)
         
         fig.update_traces(textposition='outside')
         fig.update_layout(height=400) 
         
         st.plotly_chart(fig, use_container_width=True)
-        
+            
 
-    # Donut chart for PreAuth by Status
-    status_counts = df_filtered["Status"].value_counts().reset_index()
-    status_counts.columns = ["Status", "Count"]
+        # Donut chart for PreAuth by Status
+        status_counts = df_filtered["Status"].value_counts().reset_index()
+        status_counts.columns = ["Status", "Count"]
+
     with cols2:
         st.markdown('<h2 class="custom-subheader">PreAuth By Status</h2>', unsafe_allow_html=True)    
     # Define custom colors
@@ -464,17 +471,23 @@ if not df_filtered.empty:
 
     # bar chart for preauth amount
 
-    amount_df = df_filtered.groupby(by = ["Specialisation"], as_index = False)["PreAuth Amount"].sum()
-    amount_df = amount_df.sort_values(by='PreAuth Amount', ascending=False)
+        # Group by 'Specialisation' and sum 'PreAuth Amount'
+    amount_df = df_filtered.groupby(by=["Specialisation"], as_index=False)["PreAuth Amount"].sum()
+
+    # Sort by 'PreAuth Amount' in descending order and select top 10
+    top_10_amounts = amount_df.sort_values(by='PreAuth Amount', ascending=False).head(10)
+
+
 
     with cl2:
         st.markdown('<h2 class="custom-subheader">PreAuth Amount By Specialisation</h2>', unsafe_allow_html=True)    
         custom_colors = ["#009DAE"]  # Replace with your desired colors
 
-        fig = px.histogram(amount_df, x="Specialisation", y="PreAuth Amount", template="seaborn", color_discrete_sequence=custom_colors)
+        # Create the histogram with custom colors
+        fig = px.histogram(top_10_amounts, x="Specialisation", y="PreAuth Amount", template="seaborn", color_discrete_sequence=custom_colors)
         fig.update_traces(textposition='outside')
-        fig.update_layout(height=400, xaxis_title="PreAuth Amount",yaxis_title="Doctor Specialisation"
-        )  # Adjust the height as needed
+        fig.update_layout(height=400, xaxis_title="Doctor Specialisation", yaxis_title="PreAuth Amount")  # Adjust the height as needed
+        
         st.plotly_chart(fig, use_container_width=True)
 
     # view data for amount and channel
