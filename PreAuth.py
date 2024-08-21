@@ -494,7 +494,7 @@ if not df_filtered.empty:
 
     cls1, cls2 = st.columns((2))
     with cls2:
-        with st.expander("PreAuth Amount ViewData"):
+        with st.expander("PreAuth Amount for the 10 ten Specialisations")                         "):
             st.write(amount_df.style.format({'PreAuth Amount': '${:,.2f}'}).background_gradient(cmap="YlOrBr"))
 
     with cls1:
